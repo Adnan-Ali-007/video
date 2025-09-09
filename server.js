@@ -1,21 +1,24 @@
-const WebSocketServer = require("websocket").server
-const http = require("http")
-
-// Create HTTP server
-const server = http.createServer((req, res) => {
-  res.writeHead(404)
-  res.end()
-})
-
-server.listen(3000, () => {
-  console.log("Listening on port 3000...")
-})
-
+const WebSocketServer = require("websocket").server;
+const http = require("http");
+const express = require("express");
+const path = require("path");
+const app = express();
+// Serve static files
+app.use(express.static(__dirname));  // For style.css in root
+app.use('/sender', express.static(path.join(__dirname, 'sender')));  // Serve sender folder at /sender
+app.use('/receiver', express.static(path.join(__dirname, 'receiver')));  // Serve receiver folder at /receiver
+app.use((req, res) => {
+  res.status(404).send();
+});
+const server = http.createServer(app);
+const port = process.env.PORT || 3000;
+server.listen(port, () => {
+  console.log(`Listening on port ${port}...`);
+});
 // Attach WebSocket server to the HTTP server
 const webSocket = new WebSocketServer({
   httpServer: server
-})
-
+});
 let users = []
 
 webSocket.on("request", (req) => {
@@ -30,7 +33,7 @@ webSocket.on("request", (req) => {
         if (user) return
         const newUser = { conn: connection, username: data.username }
         users.push(newUser)
-        console.log("User stored:", newUser.username)
+        console.log("User :", newUser.username)
         break
 
       case "store_offer":

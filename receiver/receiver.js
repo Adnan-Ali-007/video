@@ -1,5 +1,5 @@
-const webSocket = new WebSocket("ws://localhost:3000")
-
+const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+const webSocket = new WebSocket(`${protocol}//${window.location.host}`);
 webSocket.onmessage = (event) => {
     handleSignallingData(JSON.parse(event.data))
 }
